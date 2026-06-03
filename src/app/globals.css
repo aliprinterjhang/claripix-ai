@@ -1,0 +1,18 @@
+*(Jab aap `src/` ke baad `/` likhenge, to GitHub automatic usko folder bana dega, aapne poora naam aise hi likhna hai).*
+* **Code (Niche box mein paste karein):**
+  ```css
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+
+  body {
+    background-color: #030712;
+    color: #f8fafc;
+    font-family: sans-serif;
+  }
+
+  .glass-panel {
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
