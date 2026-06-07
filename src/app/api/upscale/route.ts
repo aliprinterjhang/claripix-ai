@@ -23,14 +23,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Using the official, highly stable xinntao/realesrgan model version
+    // Using the official stable model string directly without hardcoded version hash
     const output = await replicate.run(
-      "xinntao/realesrgan:1b9734c1929c99061aa32efad560e91f66c53bc47ef20dae59fa255b87b275e6",
+      "xinntao/realesrgan",
       {
         input: {
           image: image,
-          scale: 4, // Upscale factor (4x premium quality)
-          face_enhance: true, // Enhances faces automatically if present
+          scale: 4,
+          face_enhance: true,
         },
       }
     );
