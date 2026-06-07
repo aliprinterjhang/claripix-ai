@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import Replicate from "replicate";
+
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN || "",
+});
 
 export async function POST(request: Request) {
   try {
@@ -8,30 +13,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
     }
 
-    // Direct super-fast fallback upscaler API using official Hugging Face architecture
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/gandhi9k/RealESRGAN_x4plus",
+    if (!process.env.REPLICATE_API_TOKEN) {
+      return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
+    }
+
+    // High-availability public model verified for free tier accounts
+    const output = await replicate.run(
+      "lucataco/real-esrgan:400300d81b9e28f323719003cc276ef3e3d937a315e762955f269389f41b2123",
       {
-        headers: { "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify({ inputs: image }),
+        input: {
+          image: image,
+          scale: 2,
+          face_enhance: true
+        }
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Hugging Face API returned status ${response.status}`);
-    }
-
-    // Convert the raw image blob response directly to base64 string for your frontend
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Image = `data:image/png;base64,${buffer.toString("base64")}`;
-
-    return NextResponse.json({ output: base64Image }, { status: 200 });
+    return NextResponse.json({ output }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix HF Production Error:", error);
+    console.error("ClariPix Production Error:", error);
     return NextResponse.json(
-      { error: `ClariPix Free Pipeline Error: ${error.message || error}` },
+      { error: `ClariPix Engine Error: ${error.message || error}` },
       { status: 500 }
     );
   }
