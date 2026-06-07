@@ -17,13 +17,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Direct model slug invocation to prevent 422 permission errors
+    // Using the most standard, highly accessible public version deployment for Real-ESRGAN
     const output = await replicate.run(
-      "cjwbw/real-esrgan-a100:a100",
+      "ai-forever/real-esrgan:f592f0fa6641ae15286a5ad3ae0c732ef35ade334ebecfe875e07661bbfe6466",
       {
         input: {
           image: image,
-          upscale: 2,
           face_enhance: true
         }
       }
@@ -31,9 +30,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ output }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix V4 Production Error:", error);
+    console.error("ClariPix V5 Production Error:", error);
     return NextResponse.json(
-      { error: `ClariPix V4 Ultimate Error: ${error.message || error}` },
+      { error: `ClariPix V5 Final Validation Error: ${error.message || error}` },
       { status: 500 }
     );
   }
