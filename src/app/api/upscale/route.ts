@@ -17,16 +17,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Explicitly using codeformer with a fresh verified hash
+    // Using a verified fully public upscale model runtime on Replicate
     const output = await replicate.run(
-      "sczhou/codeformer:7de2ac143916f53a702d1ec9e46b0d3611dc1c25259cfd75d7939ce97fe035bb",
+      "asadirshad/upscaler:00b95b86370be8192a2a07c3d28905bc93be81a535dc5125345d39f4ff31c4f9",
       {
         input: {
           image: image,
-          upscale: 2,
-          face_upsample: true,
-          background_enhance: true,
-          codeformer_fidelity: 0.5
+          face_enhance: true,
         },
       }
     );
@@ -34,7 +31,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ output }, { status: 200 });
   } catch (error: any) {
     console.error("ClariPix AI Custom Error Log:", error);
-    // Hum error message ko customize kar rahe hain taake pata chale naya code chal raha hai
     return NextResponse.json(
       { error: `ClariPix Backend Error: ${error.message}` },
       { status: 500 }
