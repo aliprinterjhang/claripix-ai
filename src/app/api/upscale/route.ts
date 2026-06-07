@@ -1,9 +1,4 @@
 import { NextResponse } from "next/server";
-import Replicate from "replicate";
-
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN || "",
-});
 
 export async function POST(request: Request) {
   try {
@@ -13,26 +8,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
     }
 
-    if (!process.env.REPLICATE_API_TOKEN) {
-      return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
-    }
-
-    // Using the most standard, highly accessible public version deployment for Real-ESRGAN
-    const output = await replicate.run(
-      "ai-forever/real-esrgan:f592f0fa6641ae15286a5ad3ae0c732ef35ade334ebecfe875e07661bbfe6466",
+    // Direct super-fast fallback upscaler API using official Hugging Face architecture
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/gandhi9k/RealESRGAN_x4plus",
       {
-        input: {
-          image: image,
-          face_enhance: true
-        }
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify({ inputs: image }),
       }
     );
 
-    return NextResponse.json({ output }, { status: 200 });
+    if (!response.ok) {
+      throw new Error(`Hugging Face API returned status ${response.status}`);
+    }
+
+    // Convert the raw image blob response directly to base64 string for your frontend
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64Image = `data:image/png;base64,${buffer.toString("base64")}`;
+
+    return NextResponse.json({ output: base64Image }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix V5 Production Error:", error);
+    console.error("ClariPix HF Production Error:", error);
     return NextResponse.json(
-      { error: `ClariPix V5 Final Validation Error: ${error.message || error}` },
+      { error: `ClariPix Free Pipeline Error: ${error.message || error}` },
       { status: 500 }
     );
   }
