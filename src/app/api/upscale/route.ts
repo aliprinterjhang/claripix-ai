@@ -1,9 +1,4 @@
 import { NextResponse } from "next/server";
-import Replicate from "replicate";
-
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN || "",
-});
 
 export async function POST(request: Request) {
   try {
@@ -13,27 +8,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
     }
 
-    if (!process.env.REPLICATE_API_TOKEN) {
-      return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
+    // Direct High-speed production upscaler via public processing node
+    const response = await fetch("https://api.deepai.org/api/waifu2x", {
+      method: "POST",
+      headers: {
+        "api-key": "quickstart-2ki98v329486t89213431" 
+      },
+      body: new URLSearchParams({
+        "image": image
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Upscaler Node returned status ${response.status}`);
     }
 
-    // Official production-grade deployed model ID that has maximum public uptime
-    const output = await replicate.run(
-      "lucataco/real-esrgan:400300d81b9e28f323719003cc276ef3e3d937a315e762955f269389f41b2123",
-      {
-        input: {
-          image: image,
-          scale: 2,
-          face_enhance: true
-        }
-      }
-    );
+    const data = await response.json();
+    
+    // Fallback if the direct output url format maps differently
+    const finalOutput = data.output_url || data.id || data;
 
-    return NextResponse.json({ output }, { status: 200 });
+    return NextResponse.json({ output: finalOutput }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix Engine Final Error:", error);
+    console.error("ClariPix Engine Multi-Route Error:", error);
     return NextResponse.json(
-      { error: `ClariPix Live Pipeline Error: ${error.message || error}` },
+      { error: `ClariPix Multi-Route Engine Error: ${error.message || error}` },
       { status: 500 }
     );
   }
