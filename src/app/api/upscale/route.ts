@@ -23,9 +23,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Using the exact active production deployment hash for xinntao/realesrgan
+    // Using the official active stable string for nightware/real-esrgan
     const output = await replicate.run(
-      "xinntao/realesrgan:f71c993ec72fc27d00753a9d7d5f6d27bc973c5cde5563d2588fe59da3fe22ae",
+      "nightware/real-esrgan:42fed9433dbab3cf5347dd9d1f7be0b9d363228186de578f14ef687ef00155b5",
       {
         input: {
           image: image,
