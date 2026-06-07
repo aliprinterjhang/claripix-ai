@@ -17,21 +17,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Official runtime using model slug instead of broken version hashes
+    // Using stable upscaler structure with error resilience
     const output = await replicate.run(
-      "nightware/real-esrgan:42fed9433dbab3cf5347dd9d1f7be0b9d363228186de578f14ef687ef00155b5",
+      "cjwbw/real-esrgan:d0102b5b46f2316bb01ced7a3295d5229b7361a7c2e99d3eec90ee693b4a243a",
       {
         input: {
           image: image,
-          scale: 2,
-          face_enhance: true
+          upscale: 2,
+          face_enhance: true,
         },
       }
     );
 
     return NextResponse.json({ output }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix AI Custom Error Log:", error);
+    console.error("ClariPix AI Production Error Log:", error);
     return NextResponse.json(
       { error: `ClariPix Backend Error: ${error.message || error}` },
       { status: 500 }
