@@ -17,22 +17,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Official production-ready stable model call
+    // Direct model slug invocation to prevent 422 permission errors
     const output = await replicate.run(
-      "stability-ai/sdxl-uploader:a01b0b797fc61f621d8b67f13b6f9f3c7e7b6495d5229b7361a7c2e99d3eec90",
+      "cjwbw/real-esrgan-a100:a100",
       {
         input: {
           image: image,
-          task: "real-esrgan-x2"
+          upscale: 2,
+          face_enhance: true
         }
       }
     );
 
     return NextResponse.json({ output }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix V3 Final Error:", error);
+    console.error("ClariPix V4 Production Error:", error);
     return NextResponse.json(
-      { error: `ClariPix V3 Final Error: ${error.message || error}` },
+      { error: `ClariPix V4 Ultimate Error: ${error.message || error}` },
       { status: 500 }
     );
   }
