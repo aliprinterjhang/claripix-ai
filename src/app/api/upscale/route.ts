@@ -23,9 +23,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Using the official stable model string directly without hardcoded version hash
+    // Using the exact active production deployment hash for xinntao/realesrgan
     const output = await replicate.run(
-      "xinntao/realesrgan",
+      "xinntao/realesrgan:f71c993ec72fc27d00753a9d7d5f6d27bc973c5cde5563d2588fe59da3fe22ae",
       {
         input: {
           image: image,
