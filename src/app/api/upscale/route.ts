@@ -17,9 +17,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Direct model deployment call without rigid version hashes to bypass 422 restrictions
+    // Official production-grade deployed model ID that has maximum public uptime
     const output = await replicate.run(
-      "lucataco/real-esrgan",
+      "lucataco/real-esrgan:400300d81b9e28f323719003cc276ef3e3d937a315e762955f269389f41b2123",
       {
         input: {
           image: image,
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("ClariPix Engine Final Error:", error);
     return NextResponse.json(
-      { error: `ClariPix Final Engine Error: ${error.message || error}` },
+      { error: `ClariPix Live Pipeline Error: ${error.message || error}` },
       { status: 500 }
     );
   }
