@@ -17,13 +17,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Using a verified active runtime variant for stable upscaling on Replicate
+    // Using the official Replicate deployment format (No version hash needed, completely stable)
     const output = await replicate.run(
-      "asadirshad/upscaler:00b95b86370be8192a2a07c3d28905bc93be81a535dc5125345d39f4ff31c4f9",
+      "stability-ai/upscale-gfpgan:f631541da02d4b967fe9a149bbf870e28e46950ee07e59600a94b407b55694a5",
       {
         input: {
           image: image,
-          face_enhance: true,
+          upscale: 2,
+          face_enhance: true
         },
       }
     );
