@@ -23,14 +23,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // Using the highly stable official stability-ai Real-ESRGAN model deployment
+    // Using sczhou/codeformer which is active, premium, and fully supported on Replicate
     const output = await replicate.run(
-      "stability-ai/esrgan:f621160de6e3b08cf0bf3ef74b1cb3b320bc69519ae8fa9f2a4729f6b9bc66cf",
+      "sczhou/codeformer:7de2ac143916f53a702d1ec9e46b0d3611dc1c25259cfd75d7939ce97fe035bb",
       {
         input: {
           image: image,
-          scale: 4,
-          face_enhance: true,
+          upscale: 4, // 4x enhancement for high resolution posters/flexes
+          face_upsample: true,
+          background_enhance: true,
+          codeformer_fidelity: 0.7
         },
       }
     );
