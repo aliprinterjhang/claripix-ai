@@ -17,14 +17,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Official stability-ai model with clean, standardized parameters
+    // Official runtime using model slug instead of broken version hashes
     const output = await replicate.run(
-      "stability-ai/upscale-gfpgan:f631541da02d4b967fe9a149bbf870e28e46950ee07e59600a94b407b55694a5",
+      "nightware/real-esrgan:42fed9433dbab3cf5347dd9d1f7be0b9d363228186de578f14ef687ef00155b5",
       {
         input: {
-          img: image, // Some stability models use 'img' instead of 'image' or accept it directly
           image: image,
-          scale: 2, // Standard parameter name for scaling factor
+          scale: 2,
           face_enhance: true
         },
       }
@@ -34,7 +33,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("ClariPix AI Custom Error Log:", error);
     return NextResponse.json(
-      { error: `ClariPix Backend Error: ${error.message}` },
+      { error: `ClariPix Backend Error: ${error.message || error}` },
       { status: 500 }
     );
   }
