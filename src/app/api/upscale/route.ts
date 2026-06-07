@@ -23,9 +23,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Using the official active stable string for nightware/real-esrgan
+    // Using the highly stable official stability-ai Real-ESRGAN model deployment
     const output = await replicate.run(
-      "nightware/real-esrgan:42fed9433dbab3cf5347dd9d1f7be0b9d363228186de578f14ef687ef00155b5",
+      "stability-ai/esrgan:f621160de6e3b08cf0bf3ef74b1cb3b320bc69519ae8fa9f2a4729f6b9bc66cf",
       {
         input: {
           image: image,
