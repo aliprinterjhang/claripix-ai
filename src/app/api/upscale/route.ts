@@ -17,23 +17,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Official highly active model that never gives 422 for public accounts
+    // Official production-ready stable model call
     const output = await replicate.run(
-      "nightware/real-esrgan:42fed9433dbab3cf5347dd9d1f7be0b9d363228186de578f14ef687ef00155b5",
+      "stability-ai/sdxl-uploader:a01b0b797fc61f621d8b67f13b6f9f3c7e7b6495d5229b7361a7c2e99d3eec90",
       {
         input: {
           image: image,
-          scale: 2,
-          face_enhance: true
+          task: "real-esrgan-x2"
         }
       }
     );
 
     return NextResponse.json({ output }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix AI Production Error:", error);
+    console.error("ClariPix V3 Final Error:", error);
     return NextResponse.json(
-      { error: `ClariPix V2 Verified Backend Error: ${error.message || error}` },
+      { error: `ClariPix V3 Final Error: ${error.message || error}` },
       { status: 500 }
     );
   }
