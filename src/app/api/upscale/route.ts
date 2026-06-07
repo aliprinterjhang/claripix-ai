@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Using a verified active runtime variant for stable upscaling
+    // Using a verified active runtime variant for stable upscaling on Replicate
     const output = await replicate.run(
       "asadirshad/upscaler:00b95b86370be8192a2a07c3d28905bc93be81a535dc5125345d39f4ff31c4f9",
       {
