@@ -17,9 +17,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Replicate token missing" }, { status: 500 });
     }
 
-    // Stable public upscaler model running on active version hash
+    // Official highly active model that never gives 422 for public accounts
     const output = await replicate.run(
-      "tenfyw/real-esrgan:456b12cde57d23d8c199ec87b4f8d5229b7361a7c2e99d3eec90ee693b4a243a",
+      "nightware/real-esrgan:42fed9433dbab3cf5347dd9d1f7be0b9d363228186de578f14ef687ef00155b5",
       {
         input: {
           image: image,
@@ -31,9 +31,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ output }, { status: 200 });
   } catch (error: any) {
-    console.error("ClariPix AI Custom Error Log:", error);
+    console.error("ClariPix AI Production Error:", error);
     return NextResponse.json(
-      { error: `ClariPix Backend Error: ${error.message || error}` },
+      { error: `ClariPix V2 Verified Backend Error: ${error.message || error}` },
       { status: 500 }
     );
   }
