@@ -8,11 +8,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
     }
 
-    // Direct High-speed production upscaler via public processing node
+    const apiKey = process.env.DEEPAI_API_KEY || "quickstart-2ki98v329486t89213431";
+
+    // Direct High-speed production upscaler node
     const response = await fetch("https://api.deepai.org/api/waifu2x", {
       method: "POST",
       headers: {
-        "api-key": "quickstart-2ki98v329486t89213431" 
+        "api-key": apiKey
       },
       body: new URLSearchParams({
         "image": image
@@ -25,10 +27,12 @@ export async function POST(request: Request) {
 
     const data = await response.json();
     
-    // Fallback if the direct output url format maps differently
-    const finalOutput = data.output_url || data.id || data;
+    // DeepAI returns a direct optimized image url in 'output_url'
+    if (data && data.output_url) {
+      return NextResponse.json({ output: data.output_url }, { status: 200 });
+    }
 
-    return NextResponse.json({ output: finalOutput }, { status: 200 });
+    return NextResponse.json({ output: data }, { status: 200 });
   } catch (error: any) {
     console.error("ClariPix Engine Multi-Route Error:", error);
     return NextResponse.json(
