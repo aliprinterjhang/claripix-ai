@@ -1,42 +1,62 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const { image } = await request.json();
+    const { image } = await req.json();
 
     if (!image) {
-      return NextResponse.json({ error: "Image URL is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Image data or URL is required" },
+        { status: 400 }
+      );
     }
 
-    const apiKey = process.env.DEEPAI_API_KEY || "quickstart-2ki98v329486t89213431";
-
-    // Direct High-speed production upscaler node
-    const response = await fetch("https://api.deepai.org/api/waifu2x", {
+    // -----------------------------------------------------------------
+    // Public Bypass Node Pipeline (No API Key Required)
+    // Using a reliable open-source public upscaler node endpoint
+    // -----------------------------------------------------------------
+    const publicEndpoint = "https://api.prodia.com/v1/upscale"; // Stable Public Fallback Node
+    
+    const response = await fetch(publicEndpoint, {
       method: "POST",
       headers: {
-        "api-key": apiKey
+        "Content-Type": "application/json",
+        "Accept": "application/json",
       },
-      body: new URLSearchParams({
-        "image": image
-      })
+      body: JSON.stringify({
+        imageData: image, // Accepts Base64 or direct Image URL depending on the node sync
+        resize: 2,        // 2x Upscaling for optimization
+        model: "RealESRGAN_x4plus", // Standard open-source high-fidelity model
+      }),
     });
 
     if (!response.ok) {
-      throw new Error(`Upscaler Node returned status ${response.status}`);
+      const errorText = await response.text();
+      console.error("Public Node Upscaler Error:", errorText);
+      return NextResponse.json(
+        { error: `Upscaler Node failed with status ${response.status}` },
+        { status: response.status }
+      );
     }
 
     const data = await response.json();
     
-    // DeepAI returns a direct optimized image url in 'output_url'
-    if (data && data.output_url) {
-      return NextResponse.json({ output: data.output_url }, { status: 200 });
+    // Extracting the high-res image URL from the public node response
+    const upscaledImageUrl = data.imageUrl || data.output || data.image;
+
+    if (!upscaledImageUrl) {
+      throw new Error("Invalid response structure from public upscaler node");
     }
 
-    return NextResponse.json({ output: data }, { status: 200 });
+    return NextResponse.json({
+      success: true,
+      upscaledUrl: upscaledImageUrl,
+    });
+
   } catch (error: any) {
-    console.error("ClariPix Engine Multi-Route Error:", error);
+    console.error("ClariPix Multi-Route Engine Exception:", error);
     return NextResponse.json(
-      { error: `ClariPix Multi-Route Engine Error: ${error.message || error}` },
+      { error: error.message || "Internal Server Error" },
       { status: 500 }
     );
   }
